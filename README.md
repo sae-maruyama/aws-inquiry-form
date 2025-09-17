@@ -34,9 +34,10 @@ https://blue-bird.blog         https://api-gateway-url
 4. **CORS チェック**: Lambda が `Access-Control-Allow-Origin` ヘッダーを付けてレスポンス
 5. **成功**: ブラウザがレスポンスを JavaScript に渡す
 
-### 設定箇所まとめ
+### 設定箇所
 - **CORS**: Lambda コード内の `cors_headers` + 環境変数 `CORS_ORIGIN`
 - **CSP**: HTML の `<meta>` タグ内の `connect-src`
+
 
 ## セットアップ手順
 
@@ -55,7 +56,7 @@ https://blue-bird.blog         https://api-gateway-url
 4. **実行ロール**: DynamoDB への読み書き権限を追加
 
 **Lambda コード**
-inquiry-lambda.py を参照
+[inquiry-lambda.py](https://github.com/sae-maruyama/inquiry-form/blob/c6c08c7054f8b4ad7e2b0aaaaea95fc0e267c617/inquiry-lambda.py) を参照
 
 5. **環境変数の設定**（重要：CORS設定）:
    - `TABLE_NAME`: `InquiryTable`
@@ -69,25 +70,24 @@ inquiry-lambda.py を参照
 ### 3. API Gateway 作成
 
 1. **API Gateway コンソール**で「REST API」を作成
-2. **API 名**: `blue-bird-blog-api`
-3. **リソース**:
+2. **リソース**:
    - ルートリソース（/）に **POST メソッド**を作成
    - **統合タイプ**: Lambda プロキシ統合
    - **Lambda 関数**: `UploadInquiry`を選択
-4. **デプロイ**: ステージ名 `dev` で API をデプロイ
-5. **呼び出し URL をメモ**: `https://api-gateway-url`
+3. **デプロイ**: ステージ名 `dev` で API をデプロイ
+4. **呼び出し URL をメモ**: `https://api-gateway-url`
 
 ### 4. S3 バケット作成
 
-1. **S3 コンソール**でバケット作成
-2. **静的ウェブサイトホスティング**を有効化
-3. **インデックスドキュメント**: `index.html`
-4. **パブリック読み取りアクセス**を許可
+1. S3 コンソールでバケット作成
+2. 静的ウェブサイトホスティングを有効化
+3. インデックスドキュメント: `index.html`
+4. パブリック読み取りアクセスをブロック
 
 ### 5. HTML フォーム作成
 
 **index.html**:
-index.html を参照
+[index.html](https://github.com/sae-maruyama/inquiry-form/blob/c6c08c7054f8b4ad7e2b0aaaaea95fc0e267c617/index.html) を参照
 
 **重要な置き換え箇所**:
 - `https://api-gateway-url` を実際の API Gateway URL に置き換える（2箇所）
@@ -98,24 +98,23 @@ index.html を参照
 
 ### 6. CloudFront Distribution 作成
 
-1. **CloudFront コンソール**で Distribution 作成
-2. **オリジンドメイン**: S3 バケットの**バケットエンドポイント**を使用
-3. **SSL 証明書**: ACM で証明書を取得（**US East 1 リージョン**で作成）
-4. **CNAME**: カスタムドメイン名（blue-bird.blog）を追加
+1. CloudFront コンソールで Distribution 作成
+2. オリジンドメイン: S3 バケットのバケットエンドポイントを使用
+3. SSL 証明書: ACM で証明書を取得（us-east-1 リージョンで作成）
+4. CNAME: カスタムドメイン名（blue-bird.blog）を追加
 
 ### 7. Route53 設定
 
-1. **Route53 コンソール**でホストゾーン作成
+1. **Route53** コンソールでホストゾーン作成
 2. **ドメイン名**: blue-bird.blog
 3. **A レコード作成**:
-   - **名前**: blue-bird.blog
-   - **エイリアス**: はい
-   - **エイリアス先**: CloudFront Distribution
+   - 名前: blue-bird.blog
+   - エイリアス: はい
+   - エイリアス先: CloudFront Distribution
 4. **お名前.com 設定**: ネームサーバーを Route53 のものに変更
 
-## テスト・デバッグ
 
-### 動作確認手順
+## 動作確認手順
 1. `https://blue-bird.blog` でフォームにアクセス
 2. 全項目入力して送信
 3. 成功メッセージとID表示を確認
@@ -131,8 +130,3 @@ index.html を参照
 | CORS エラー | Lambda の CORS_ORIGIN 環境変数未設定 | 環境変数を確認 |
 | JavaScript が動作しない | キャッシュまたはCSPエラー | CloudFrontキャッシュ削除、ブラウザ強制リフレッシュ |
 | API が見つからない | API Gateway URL 間違い | ステージの呼び出し URL を再確認 |
-
-### デバッグ方法
-- **ブラウザ**: F12 で Console と Network タブを確認
-- **Lambda**: CloudWatch Logs でエラー確認
-- **CORS確認**: Network タブでレスポンスヘッダーを確認
