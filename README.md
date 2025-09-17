@@ -8,7 +8,7 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム:
 Webフォーム (S3 + CloudFront) → API Gateway → Lambda → DynamoDB
 https://blue-bird.blog         https://api-gateway-url
 ```
-![構成図](構成図.png)
+![alt text](images/arc.png)
 
 ## 前提条件
 
@@ -120,6 +120,9 @@ index.html を参照
 2. 全項目入力して送信
 3. 成功メッセージとID表示を確認
 4. DynamoDB テーブルでデータ保存確認
+
+![alt text](images/form-image.png)
+![alt text](images/dynamodb-table.png)
 
 ### よくある問題
 
