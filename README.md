@@ -6,7 +6,7 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム:
 
 ```
 Webフォーム (S3 + CloudFront) → API Gateway → Lambda → DynamoDB
-https://blue-bird.blog         https://xxxxx.execute-api.us-east-1.amazonaws.com/dev
+https://blue-bird.blog         https://api-gateway-url
 ```
 
 ## 前提条件
@@ -74,7 +74,7 @@ inquiry-lambda.py を参照
    - **統合タイプ**: Lambda プロキシ統合
    - **Lambda 関数**: `UploadInquiry`を選択
 4. **デプロイ**: ステージ名 `dev` で API をデプロイ
-5. **呼び出し URL をメモ**: `https://xxxxx.execute-api.region.amazonaws.com/dev`
+5. **呼び出し URL をメモ**: `https://api-gateway-url`
 
 ### 4. S3 バケット作成
 
@@ -89,7 +89,7 @@ inquiry-lambda.py を参照
 index.html を参照
 
 **重要な置き換え箇所**:
-- `https://xxxxx.execute-api.region.amazonaws.com` を実際の API Gateway URL に置き換える（2箇所）
+- `https://api-gateway-url` を実際の API Gateway URL に置き換える（2箇所）
 
 **CSP設定のポイント**:
 - `connect-src` に API Gateway URL を追加
