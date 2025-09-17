@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>お問い合わせフォーム</title>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://9k5s7cusu7.execute-api.us-east-1.amazonaws.com;">
+    <style>
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 0.5rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .required {
+            color: red;
+            font-size: 0.9rem;
+        }
+
+        button {
+            background-color: #0073e6;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="inquiryForm">
+        <div class="form-group">
+            <label for="userName">お名前 <span class="required">※必須</span></label>
+            <input type="text" id="userName" name="userName" autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="mailAddress">メールアドレス <span class="required">※必須</span></label>
+            <input type="email" id="mailAddress" name="mailAddress" autocomplete="email" inputmode="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="reviewText">お問い合わせ内容 <span class="required">※必須</span></label>
+            <textarea id="reviewText" name="reviewText" rows="5" required></textarea>
+        </div>
+
+        <button type="submit">送信</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('inquiryForm');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const submitButton = form.querySelector('button[type="submit"]');
+                const originalText = submitButton.textContent;
+                submitButton.textContent = '送信中...';
+                submitButton.disabled = true;
+
+                const formData = {
+                    userName: document.getElementById('userName').value,
+                    mailAddress: document.getElementById('mailAddress').value,
+                    reviewText: document.getElementById('reviewText').value
+                };
+
+                fetch('https://9k5s7cusu7.execute-api.us-east-1.amazonaws.com/dev', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (result) {
+                        if (result.message) {
+                            alert('お問い合わせを送信しました！ID: ' + result.id);
+                            form.reset();
+                        } else {
+                            throw new Error(result.error || 'エラーが発生しました');
+                        }
+                    })
+                    .catch(function (error) {
+                        alert('送信に失敗しました: ' + error.message);
+                        console.error('Error:', error);
+                    })
+                    .finally(function () {
+                        submitButton.textContent = originalText;
+                        submitButton.disabled = false;
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
