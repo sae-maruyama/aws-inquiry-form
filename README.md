@@ -14,7 +14,7 @@ https://blue-bird.blog         https://api-gateway-url
 - AWS アカウント
 - 取得済みドメイン（例：お名前.com で取得した blue-bird.blog）
 
-## CORS と CSP について
+## 【前提知識】CORS と CSP について
 
 ### CORS（Cross-Origin Resource Sharing）とは
 - **目的**: 異なるドメイン間での通信を許可する仕組み
