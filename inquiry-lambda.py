@@ -84,6 +84,7 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'headers': cors_headers,
         'body': json.dumps({
-            'message': 'Inquiry saved successfully!'
+            'message': 'Inquiry saved successfully!',
+            'id': item_id
         })
     }
