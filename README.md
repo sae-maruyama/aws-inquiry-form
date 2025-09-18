@@ -1,6 +1,6 @@
 # AWS サーバーレス お問い合わせフォーム
 
-AWS サービスを使用したサーバーレスお問い合わせフォーム: S3 + CloudFront + API Gateway + Lambda + DynamoDB
+AWS サービスを使用したサーバーレスお問い合わせフォームの作成
 
 ## システム構成
 
@@ -43,17 +43,13 @@ https://blue-bird.blog         https://api-gateway-url
 
 ### 1. DynamoDB テーブル作成
 
-1. DynamoDB コンソールで「テーブルの作成」
-2. テーブル名: `InquiryTable`
-3. パーティションキー: `id` (String)
-4. その他はデフォルト設定で作成
+1. パーティションキー: `id` (String)
+2. その他はデフォルト設定で作成
 
 ### 2. Lambda 関数作成
 
-1. Lambda コンソールで「関数の作成」
-2. 関数名: `UploadInquiry`
-3. ランタイム: Python 
-4. 実行ロール: DynamoDB への読み書き権限を追加
+1. ランタイム: Python 
+2. IAM実行ロール: DynamoDBFullAccessを追加
 
 Lambda コード
 [inquiry-lambda.py](https://github.com/sae-maruyama/inquiry-form/blob/c6c08c7054f8b4ad7e2b0aaaaea95fc0e267c617/inquiry-lambda.py) を参照
@@ -65,7 +61,7 @@ Lambda コード
 CORS設定のポイント: 
 - すべての `return` 文に `headers: cors_headers` を含める
 - 環境変数で簡単にドメインを変更可能
-- Lambda プロキシ統合では、API Gateway側ではなくLambda側でCORSを制御
+- Lambda プロキシ統合では、API Gateway側ではなくLambda側でCORSを制御する！
 
 ### 3. API Gateway 作成
 
@@ -73,13 +69,12 @@ CORS設定のポイント:
 2. リソース:
    - ルートリソース（/）に POST メソッドを作成
    - 統合タイプ: Lambda プロキシ統合
-   - Lambda 関数: `UploadInquiry`を選択
-3. デプロイ: ステージ名 `dev` で API をデプロイ
+3. デプロイ: ステージを作成してAPI をデプロイ
 4. 呼び出し URL をメモ: `https://api-gateway-url`
 
 ### 4. S3 バケット作成
 
-1. S3 コンソールでバケット作成
+1. バケットを作成
 2. 静的ウェブサイトホスティングを有効化
 3. インデックスドキュメント: `index.html`
 4. パブリック読み取りアクセスをブロック
@@ -101,7 +96,6 @@ CSP設定のポイント:
 1. CloudFront コンソールで Distribution 作成
 2. オリジンドメイン: S3 バケットのバケットエンドポイントを使用
 3. SSL 証明書: ACM で証明書を取得（us-east-1 リージョンで作成）
-4. CNAME: カスタムドメイン名（blue-bird.blog）を追加
 
 ### 7. Route53 設定
 
@@ -109,8 +103,8 @@ CSP設定のポイント:
 2. ドメイン名: blue-bird.blog
 3. A レコード作成:
    - 名前: blue-bird.blog
-   - エイリアス: はい
    - エイリアス先: CloudFront Distribution
+   - CNAMEを追加
 4. お名前.com 設定: ネームサーバーを Route53 のものに変更
 
 
@@ -123,7 +117,7 @@ CSP設定のポイント:
 ![alt text](images/form-image.png)
 ![alt text](images/dynamodb-table.png)
 
-### よくある問題
+### 問題と解決方法
 
 | 問題 | 原因 | 解決方法 |
 |------|------|----------|
