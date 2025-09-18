@@ -5,7 +5,12 @@
     <meta charset="UTF-8">
     <title>お問い合わせフォーム</title>
     <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://9k5s7cusu7.execute-api.us-east-1.amazonaws.com;">
+  content="
+    default-src 'self';
+    script-src 'self' 'nonce-abc123';
+    style-src 'self' 'nonce-abc123';
+    connect-src 'self' https://9k5s7cusu7.execute-api.us-east-1.amazonaws.com;">
+    
     <style nonce="abc123">
         .form-group {
             margin-bottom: 1rem;
