@@ -5,8 +5,9 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 ## システム構成
 
 ```
-Webフォーム (S3 + CloudFront) → API Gateway → Lambda → DynamoDB
-https://blue-bird.blog         https://api-gateway-url
+ユーザー → Webフォーム:CloudFront → S3（https://blue-bird.blog）
+↓
+ブラウザのJavaScript → API Gateway（https://api-gateway-url） → Lambda → DynamoDB
 ```
 ![alt text](images/arc.png)
 
