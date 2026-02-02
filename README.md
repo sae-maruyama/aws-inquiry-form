@@ -25,15 +25,15 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 
 ### CSP（Content Security Policy）とは
 - 目的: XSS攻撃などのセキュリティリスクを防ぐ
-- 必要性: なくても動作するが、セキュリティ向上のため推奨
-- 設定方法: HTML側でメタタグにより「このページはどこへのリクエストを許可するか」を制限
+- 必要な理由: なくても動作するが、セキュリティ向上のため推奨
+- 設定方法: HTML側でメタタグにより「このページはどこへのリクエストを許可するか」を制限（今回の場合は https://api-gateway-url を許可）
 
 ### リクエストの流れ
 1. ユーザーが `https://blue-bird.blog` でフォーム送信
 2. CSP チェック: ブラウザが「connect-src」設定を確認し、API Gateway への接続を許可
 3. JavaScript実行: `fetch()` で API Gateway にPOSTリクエスト送信
 4. CORS チェック: Lambda が `Access-Control-Allow-Origin` ヘッダーを付けてレスポンス
-5. 成功: ブラウザがレスポンスを JavaScript に渡す
+5. 成功: ブラウザが`Access-Control-Allow-Origin`ヘッダーにhttps://blue-bird.blog が設定されていることを確認し、レスポンスを JavaScript に渡す
 
 ### 設定箇所
 - CORS: Lambda コード内の `cors_headers` + 環境変数 `CORS_ORIGIN`
