@@ -43,9 +43,6 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 - CORS: Lambda コード内の `cors_headers` + 環境変数 `CORS_ORIGIN`
 - CSP: HTML の `<meta>` タグ内の `connect-src`
 
-## 整理
-<img width="373" height="667" alt="スクリーンショット 2025-12-30 112109" src="https://github.com/user-attachments/assets/ab0e72e0-4d7f-4566-86e3-527a47e9d7c7" />
-
 ## セットアップ手順
 
 ### 1. DynamoDB テーブル作成
