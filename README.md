@@ -23,14 +23,14 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 - 必要な理由: https://blue-bird.blog のJavaScriptが https://api-gateway-url を呼ぶと、レスポンスは別オリジンから返るため、CORS許可がないとブラウザがJSにレスポンスを渡さない
 - 設定方法: API（この構成ではLambda）がレスポンスヘッダーに Access-Control-Allow-Origin: https://blue-bird.blog を付与する
 
-- ブラウザはデフォルトでは、https://api-gateway-url から返ってきたレスポンスの内容を、https://blue-bird.blog で動いているJavaScriptに渡さない。
+- 今回の例：ブラウザはデフォルトでは、https://api-gateway-url から返ってきたレスポンスの内容を、https://blue-bird.blog で動いているJavaScriptに渡さない。
   なので、https://blue-bird.blog のJavaScriptが fetch() でhttps://api-gateway-url のレスポンスをもとに、「送信完了しました」などを画面に表示したい場合は、https://api-gateway-url が CORS ヘッダーでhttps://blue-bird.blog へのレスポンス内容の公開を明示して許可する必要がある。
 
 ### CSP（Content Security Policy）とは
 - 目的: XSS攻撃などのセキュリティリスクを防ぐ
 - 必要な理由: なくても動作するが、セキュリティ向上のため推奨
 - 設定方法: HTML側でメタタグにより「このページはどこへのリクエストを許可するか」を制限（今回の場合は https://api-gateway-url を許可）
-- このページのJavaScriptは、そもそも https://api-gateway-url に通信していいのかを決めるのが CSPの connect-src
+- 今回の例：このページのJavaScriptは、そもそも https://api-gateway-url に通信していいのかを決めるのが CSPの connect-src
 
 ### リクエストの流れ
 1. ユーザーが `https://blue-bird.blog` でフォーム送信
