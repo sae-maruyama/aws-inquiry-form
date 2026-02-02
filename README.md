@@ -20,7 +20,8 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 
 ### CORS（Cross-Origin Resource Sharing）とは
 - 目的: 他オリジンから返ってきたレスポンスを、呼び出し元ページのJavaScriptに公開してよいかをブラウザが判断するための仕組み
-- 必要な理由: https://blue-bird.blog のJavaScriptが https://api-gateway-url を呼ぶと、レスポンスは別オリジンから返るため、CORS許可がないとブラウザがJSにレスポンスを渡さない
+- 必要な理由: https://blue-bird.blog の JavaScript が https://api-gateway-url にリクエストを送ると、別オリジンの API を呼び出すことになるが、
+  CORS が許可されていない場合、API からレスポンスは返るが、ブラウザが安全のために JavaScript からその中身を参照させないから
 - 設定方法: API（この構成ではLambda）がレスポンスヘッダーに Access-Control-Allow-Origin: https://blue-bird.blog を付与する
 
 - 今回の例：ブラウザはデフォルトでは、https://api-gateway-url から返ってきたレスポンスの内容を、https://blue-bird.blog で動いているJavaScriptに渡さない。
