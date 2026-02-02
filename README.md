@@ -19,9 +19,9 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 ## 【前提知識】CORS と CSP について
 
 ### CORS（Cross-Origin Resource Sharing）とは
-- 目的: 異なるドメイン間での通信を許可する仕組み
-- 必要な理由: `https://blue-bird.blog`（フォーム）から `https://api-gateway-url`（API）への通信は異なるオリジン間のため、ブラウザが標準でブロックする
-- 設定方法: サーバー側（Lambda）がレスポンスヘッダーで「このドメインからのアクセスを許可する」と宣言
+- 目的: 他オリジンから返ってきたレスポンスを、呼び出し元ページのJavaScriptに公開してよいかをブラウザが判断するための仕組み
+- 必要な理由: https://blue-bird.blog のJavaScriptが https://api-gateway-url を呼ぶと、レスポンスは別オリジンから返るため、CORS許可がないとブラウザがJSにレスポンスを渡さない
+- 設定方法: API（この構成ではLambda）がレスポンスヘッダーに Access-Control-Allow-Origin: https://blue-bird.blog を付与する
 
 ### CSP（Content Security Policy）とは
 - 目的: XSS攻撃などのセキュリティリスクを防ぐ
