@@ -16,29 +16,42 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 - AWS アカウント
 - 取得済みドメイン（例：お名前.com で取得した blue-bird.blog）
 
-## 【前提知識】CORS と CSP について
-
-### CORS（Cross-Origin Resource Sharing）とは
-- 目的: 他オリジンから返ってきたレスポンスを、呼び出し元ページのJavaScriptに公開してよいかをブラウザが判断するための仕組み
-- 必要な理由: https://blue-bird.blog の JavaScript が https://api-gateway-url にリクエストを送ると、別オリジンの API を呼び出すことになるが、
-  CORS が許可されていない場合、API からレスポンスは返るが、ブラウザが安全のために JavaScript からその中身を参照させないから
-- 設定方法: API（この構成ではLambda）がレスポンスヘッダーに Access-Control-Allow-Origin: https://blue-bird.blog を付与する
-
-- 今回の例：ブラウザはデフォルトでは、https://api-gateway-url から返ってきたレスポンスの内容を、https://blue-bird.blog で動いているJavaScriptに渡さない。
-  なので、https://blue-bird.blog のJavaScriptが fetch() でhttps://api-gateway-url のレスポンスをもとに、「送信完了しました」などを画面に表示したい場合は、https://api-gateway-url が CORS ヘッダーでhttps://blue-bird.blog へのレスポンス内容の公開を明示して許可する必要がある。
-
-### CSP（Content Security Policy）とは
-- 目的: XSS攻撃などのセキュリティリスクを防ぐ
-- 必要な理由: なくても動作するが、セキュリティ向上のため推奨
-- 設定方法: HTML側でメタタグにより「このページはどこへのリクエストを許可するか」を制限（今回の場合は https://api-gateway-url を許可）
-- 今回の例：このページのJavaScriptは、そもそも https://api-gateway-url に通信していいのかを決めるのが CSPの connect-src
-
 ### リクエストの流れ
 1. ユーザーが `https://blue-bird.blog` でフォーム送信
 2. CSP チェック: ブラウザが「connect-src」設定を確認し、API Gateway への接続を許可
 3. JavaScript実行: `fetch()` で API Gateway にPOSTリクエスト送信
 4. CORS チェック: Lambda が `Access-Control-Allow-Origin` ヘッダーを付けてレスポンス
-5. 成功: ブラウザが`Access-Control-Allow-Origin`ヘッダーにhttps://blue-bird.blog が設定されていることを確認し、レスポンスを JavaScript に渡す
+5. ブラウザが`Access-Control-Allow-Origin`ヘッダーにhttps://blue-bird.blog が設定されていることを確認し、レスポンスを JavaScript に渡す
+
+## 【前提知識】CORS と CSP について
+
+### CORS（Cross-Origin Resource Sharing）とは
+- フロントエンド（例：blue-bird.blog）からバックエンド API（例：api-gateway-url）へリクエストを送信する際、ブラウザのセキュリティ制限を回避するために CORS の設定が必要
+- CORS とは、ブラウザが「異なるオリジン（ドメイン、プロトコル、ポートの組み合わせ）」からのリソースへのアクセスを、安全に許可するかどうかを判断する仕組み
+   ブラウザには 「同一オリジンポリシー（Same-Origin Policy）」 というセキュリティ原則があり、デフォルトでは別サイトの API から返ってきた内容を JavaScript で読み取ることが禁止されている
+   CORS設定が無いと、API からデータは返ってくるが、ブラウザが「許可証がない」と判断し、JavaScript（fetch 等）にデータを渡さないため、影響として、画面上に「送信完了」や「取得データ」を表示できなくなる
+- 本システムでの解決策API（Lambda）側のレスポンスヘッダーに、特定のオリジンからのアクセスを許可する宣言を追加する
+  - ヘッダー　Access-Control-Allow-Origin　設定値（例：https://blue-bird.blog ） を設定し、ブラウザに対し「このサイトなら中身を公開してOK」と伝える
+
+#### 通信のイメージ
+- Request: ブラウザ上の JS が API へリクエスト
+- Response: API が「許可証（CORSヘッダー）」付きでレスポンス
+- Check: ブラウザがヘッダーを確認し、JS へデータを引き渡す
+
+### CSP（Content Security Policy）とは
+- XSS攻撃などのリスクを最小化するため、ブラウザに対し、そのページが「どのリソースを読み込んでよいか」「どこにデータを送ってよいか」というホワイトリストを提示する仕組み
+- 万が一サイトに悪意のあるスクリプトが混入しても、許可されていない外部サーバー（攻撃者のサーバーなど）へのデータ送信をブラウザが強制的にブロックする
+- 通信先を制限する connect-src という項目に、今回の API エンドポイントを明示的に指定する
+
+#### 実装方法
+- HTML の <head> セクションに以下のメタタグを記述し、許可する接続先を定義します。
+- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api-gateway-url;">
+  - default-src 'self': 画像やスクリプト等は、自身のサイト（同じオリジン）からのみ許可する
+  - connect-src 'self' https://api-gateway-url: API 通信については、自身のサイトに加えて指定した API URL のみを許可する
+
+### まとめ：CORS と CSP の役割分担
+CORS: API側が「うちのデータを blue-bird.blog に渡してもいいよ」と許可を出すもの
+CSP: サイト側が「うちは api-gateway-url 以外とは通信しちゃダメだよ」と自分を律するもの。
 
 ### 設定箇所
 - CORS: Lambda コード内の `cors_headers` + 環境変数 `CORS_ORIGIN`
