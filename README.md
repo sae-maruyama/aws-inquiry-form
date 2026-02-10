@@ -44,14 +44,11 @@ AWS サービスを使用したサーバーレスお問い合わせフォーム�
 - 通信先を制限する connect-src という項目に、今回の API エンドポイントを明示的に指定する
 
 #### 実装方法
-- HTML の <head> セクションに以下のメタタグを記述し、許可する接続先を定義します。
+- HTML の <head> セクションに以下のメタタグを記述し、許可する接続先を定義する
 - <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api-gateway-url;">
   - default-src 'self': 画像やスクリプト等は、自身のサイト（同じオリジン）からのみ許可する
   - connect-src 'self' https://api-gateway-url: API 通信については、自身のサイトに加えて指定した API URL のみを許可する
 
-### まとめ：CORS と CSP の役割分担
-CORS: API側が「うちのデータを blue-bird.blog に渡してもいいよ」と許可を出すもの
-CSP: サイト側が「うちは api-gateway-url 以外とは通信しちゃダメだよ」と自分を律するもの。
 
 ### 設定箇所
 - CORS: Lambda コード内の `cors_headers` + 環境変数 `CORS_ORIGIN`
@@ -79,7 +76,7 @@ Lambda コード
 CORS設定のポイント: 
 - すべての `return` 文に `headers: cors_headers` を含める
 - 環境変数で簡単にドメインを変更可能
-- Lambda プロキシ統合では、API Gateway側ではなくLambda側でCORSを制御する！
+- Lambda プロキシ統合では、API Gateway側ではなくLambda側でCORSを制御する
 
 ### 3. API Gateway 作成
 
